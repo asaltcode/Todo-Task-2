@@ -1,14 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import DeleteBtn from './DeleteBtn';
 import TodoLoader from '../animation/TodoLoader';
+import { format } from 'timeago.js';
 
 const DefaultData = [
     {
       id: 1,
       name: 'This task shows the default',
-      status: 'Rejected',
+      status: true,
       assignedBy: 'Bob',
-      category: 'bg-warning'
+      category: 'bg-warning',
+      createdAt: Date.now()
     },
   ];
 
@@ -21,14 +23,26 @@ const TodoList = () => {
     const newTask = {
       id: tasks.length + 1,
       name: input,
-      status: 'NEW',
+      status: false,
       assignedBy: 'You', // You can customize this
       category: 'bg-primary', // You can customize this
+      createdAt: Date.now()
     };
 
-    setTasks([...tasks, newTask]);
+    setTasks([newTask, ...tasks]);
     localStorage.setItem("tasks", JSON.stringify([...tasks, newTask]))
      setInput('')
+  }
+
+  const handleComplete = (task, index) => {
+    const access = confirm("Have you really completed this task?")
+    if(access){
+      const newArray = [...tasks]
+      const update = {...task, status : true}
+      newArray.splice(index, 1, update)
+      setTasks(newArray)
+      localStorage.setItem("tasks", JSON.stringify(newArray))
+    }
   }
 
     
@@ -55,12 +69,15 @@ const TodoList = () => {
                           <div className="widget-content p-0">
                             <div className="widget-content-wrapper">                                
                               <div className="widget-content-left">
-                                <div className="widget-heading">{task.name}<div className="badge badge-danger ml-2">Rejected</div>
+                                <div className="widget-heading">{task.name}
+                                  {!task.status || "" ? <div className="badge badge-danger ml-2">No completion</div>
+                                   : <div className="badge badge-success ml-2">Completed</div> }
                                 </div>
-                                <div className="widget-subheading"><i>By Bob</i></div>
+                                <div className="widget-subheading"><i>{format(task?.createdAt)}</i></div>
                               </div>
                               <div className="widget-content-right d-flex ">
-                                <DeleteBtn tasks={tasks} setTasks={setTasks} task={task} index={index}  />                             
+                                <button className={`completeBtn ${task.status && "invisible"}`} onClick={()=> handleComplete(task, index)} type="button"><i className="fa fa-solid fa-check"></i></button>                           
+                                <DeleteBtn tasks={tasks} setTasks={setTasks} task={task} index={index} />                             
                               </div>
                             </div>
                           </div>

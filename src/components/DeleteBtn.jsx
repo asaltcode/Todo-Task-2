@@ -1,12 +1,14 @@
 import React from 'react'
 
-const DeleteBtn = ({tasks, setTasks, task, index}) => {
+const DeleteBtn = ({tasks, setTasks, index}) => {
   const handleDelete = () =>{
-    // alert(index)
-    let newArray = [...tasks]
-    newArray.splice(index, 1)
-    setTasks(newArray)
-    localStorage.setItem("tasks",JSON.stringify(newArray))
+    const access = confirm("Do you want to delete this task?");
+    if(access){
+      let newArray = [...tasks]
+      newArray.splice(index, 1)
+      setTasks(newArray)
+      localStorage.setItem("tasks",JSON.stringify(newArray))
+    }    
   }
   return (
     <button onClick={handleDelete} className="bin-button border-0">
